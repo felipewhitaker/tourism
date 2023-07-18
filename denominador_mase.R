@@ -1,4 +1,4 @@
-# Calculando denominador MASE
+# Pacotes
 library(tidyverse)
 library(magrittr)
 
