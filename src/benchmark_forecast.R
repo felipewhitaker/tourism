@@ -52,15 +52,15 @@ for(i in seq_along(data)){
   train<-window(ts_completa, end = c(2021, 12))
   test<-window(ts_completa, start = c(2022, 1))
   # Train ETS model
-  ets_model<-ets(train)
+  ets_model<-ets(log(train))
   # Train ARIMA model
-  arima_model<-auto.arima(train)
+  arima_model<-auto.arima(log(train))
   # Make forecasts
   ets_forecast<-forecast(ets_model, h = length(test))
   arima_forecast<-forecast(arima_model, h = length(test))
   # Salvando
   lista[[i]]<-tibble("pais" = unique(df$pais), "mes_ano" = tail(df$mes_ano, 12),
-                     "prev_ets" = ets_forecast$mean, "prev_arima" = arima_forecast$mean,
+                     "prev_ets" = exp(ets_forecast$mean), "prev_arima" = exp(arima_forecast$mean),
                      "ocorrido" = tail(df$valor, 12))
   print(i)
 }
@@ -68,4 +68,4 @@ for(i in seq_along(data)){
 lista<-bind_rows(lista)
 
 # Salvando
-write.csv(lista, "data/previsoes_completa_benchmarks.csv")
+write.csv(lista, "data/logexp_previsoes_completa_benchmarks.csv")
