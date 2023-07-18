@@ -19,15 +19,15 @@ for(i in seq_along(data)){
   train<-window(ts_completa, end = c(2018, 12))
   test<-window(ts_completa, start = c(2019, 1))
   # Train ETS model
-  ets_model<-ets(train)
+  ets_model<-ets(log(train))
   # Train ARIMA model
-  arima_model<-auto.arima(train)
+  arima_model<-auto.arima(log(train))
   # Make forecasts
   ets_forecast<-forecast(ets_model, h = length(test))
   arima_forecast<-forecast(arima_model, h = length(test))
   # Salvando
   lista_pre[[i]]<-tibble("pais" = unique(df$pais), "mes_ano" = tail(df$mes_ano, 12),
-                         "prev_ets" = ets_forecast$mean, "prev_arima" = arima_forecast$mean,
+                         "prev_ets" = exp(ets_forecast$mean), "prev_arima" = exp(arima_forecast$mean),
                          "ocorrido" = tail(df$valor, 12))
   print(i)
 }
@@ -35,7 +35,7 @@ for(i in seq_along(data)){
 lista_pre<-bind_rows(lista_pre)
 
 # Salvando
-write.csv(lista_pre, "data/previsoes_pre_covid_benchmarks.csv")
+write.csv(lista_pre, "data/logexp_previsoes_pre_covid_benchmarks.csv")
 
 # Loop Completo
 # Rodando em loop
@@ -52,15 +52,15 @@ for(i in seq_along(data)){
   train<-window(ts_completa, end = c(2021, 12))
   test<-window(ts_completa, start = c(2022, 1))
   # Train ETS model
-  ets_model<-ets(log(train))
+  ets_model<-ets(log(train+1))
   # Train ARIMA model
-  arima_model<-auto.arima(log(train))
+  arima_model<-auto.arima(log(train+1))
   # Make forecasts
   ets_forecast<-forecast(ets_model, h = length(test))
   arima_forecast<-forecast(arima_model, h = length(test))
   # Salvando
   lista[[i]]<-tibble("pais" = unique(df$pais), "mes_ano" = tail(df$mes_ano, 12),
-                     "prev_ets" = exp(ets_forecast$mean), "prev_arima" = exp(arima_forecast$mean),
+                     "prev_ets" = (exp(ets_forecast$mean)-1), "prev_arima" = (exp(arima_forecast$mean)-1),
                      "ocorrido" = tail(df$valor, 12))
   print(i)
 }
